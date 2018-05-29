@@ -11,6 +11,10 @@ var turnReady;
 var pcConfig = {
   'iceServers': [{
     'url': 'stun:stun.l.google.com:19302'
+  },{
+    'credential': 'YzYNCouZM1mhqhmseWk6',
+    'url': 'turn:13.250.13.83:3478?transport=udp',
+    'username':'YzYNCouZM1mhqhmseWk6'
   }]
 };
 
@@ -24,12 +28,12 @@ var sdpConstraints = {
 
 /////////////////////////////////////////////
 
-var room = 'vivek17';
-// Could prompt for room name:
+var room = 'webrtc';
+
  room = prompt('Enter room name:');
 
-//var socket = io.connect("http://172.245.132.132:1794");
-var socket = io.connect();
+
+var socket = io.connect("https:\\192.168.156.133:7000");
 if (room !== '') {
   socket.emit('create or join', room);
   console.log('Attempted to create or  join room', room);
@@ -59,41 +63,47 @@ socket.on('log', function(array) {
   console.log.apply(console, array);
 });
 
-////////////////////////////////////////////////
+
 
 function sendMessage(message) {
   console.log('Client sending message: ', message);
   socket.emit('message', message);
 }
 
-// This client receives a message
+
 socket.on('message', function(message) {
   console.log('Client received message:', message);
 
   if (message === 'got user media') {
     maybeStart();
   } else if (message.type === 'offer') {
+
     if (!isInitiator && !isStarted) {
       maybeStart();
     }
+
     pc.setRemoteDescription(new RTCSessionDescription(message));
     doAnswer();
   } else if (message.type === 'answer' && isStarted) {
+
     console.log("received answer");
     pc.setRemoteDescription(new RTCSsseionDescription(message));
     console.log(pc.getRemoteDescription());
+
   } else if (message.type === 'candidate' && isStarted) {
+
     var candidate = new RTCIceCandidate({
       sdpMLineIndex: message.label,
       candidate: message.candidate
     });
     pc.addIceCandidate(candidate);
+
   } else if (message === 'bye' && isStarted) {
     handleRemoteHangup();
   }
 });
 
-////////////////////////////////////////////////////
+
 
 var localVideo = document.querySelector('#localVideo');
 var remoteVideo = document.querySelector('#remoteVideo');
@@ -127,7 +137,7 @@ if (location.hostname !== 'localhost') {
   requestTurn(
 //    'https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913'
     'https://service.xirsys.com/ice?ident=vivekchanddru&secret=ad6ce53a-e6b5-11e6-9685-937ad99985b9&domain=www.vivekc.xyz&application=default&room=testing&secure=1'
-  
+
 );
 }
 

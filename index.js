@@ -24,7 +24,7 @@ var io = socketIO.listen(app);
 console.log(io.handshake.headers) ;
 
 io.sockets.on('connection', function(socket) {
-log('dupa said: ');
+log('connection: ');
   // convenience function to log server messages on the client
   function log() {
     var array = ['Message from server:'];
@@ -50,6 +50,7 @@ log('Room ' + room + ' now has ' + numClients + ' client(s)');
       socket.emit('created', room, socket.id);
 
     } else if (numClients === 2) {
+
       log('Client ID ' + socket.id + ' joined room ' + room);
       io.sockets.in(room).emit('join', room);
       socket.join(room);
@@ -64,7 +65,7 @@ log('Room ' + room + ' now has ' + numClients + ' client(s)');
     var ifaces = os.networkInterfaces();
     for (var dev in ifaces) {
       ifaces[dev].forEach(function(details) {
-        if (details.family === 'IPv4' && details.address !== '192.168.156.133') {
+        if (details.family === 'IPv4' && details.address !== '192.168.1.1') {
           socket.emit('ipaddr', details.address);
         }
       });
